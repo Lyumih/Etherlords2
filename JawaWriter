@@ -1,0 +1,13 @@
+import java.io.FileWriter;
+import java.io.IOException;
+
+public class JavaWriter {
+    public static void main(String[] args) throws IOException{
+        FileWriter fw = new FileWriter("book");
+        fw.write("Начало строки\n");
+        fw.write("Описание сценария\n");
+        fw.write("Start();\n");
+        fw.write("End();\n");
+        fw.close();
+    }
+}
