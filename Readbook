@@ -1,0 +1,44 @@
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Scanner;
+
+public class BookReader {
+    public static void main(String[] args) throws IOException {
+
+        JavaReader();
+
+    }
+
+    public static void JavaReader()throws IOException{
+
+        FileReader fr = new FileReader("book");
+        Scanner scan = new Scanner(fr);
+
+        int i = 1;
+
+        while (scan.hasNext()) {
+            String line = scan.nextLine();
+            if (line.equals("Start();")){
+                System.out.println(".............Программа запустилась");
+            }
+            if (line.startsWith("//")){
+                System.out.println("Комментарий");
+                continue;
+            }
+            if (line.equals("End();")){
+                System.out.println(".............Программа закончилась");
+                break;
+            }
+            //System.out.println(i + " : " + line);
+            i++;
+        }
+
+        fr.close();
+    }
+
+    public static void LibProg(){
+        String a = "моб";
+        String b = "дом";
+
+    }
+}
