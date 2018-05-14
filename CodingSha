@@ -1,0 +1,165 @@
+import com.sun.org.apache.xpath.internal.SourceTree;
+
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+public class CodingSha {
+
+    public static void main(String[] args) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+        System.out.println("***********");
+        System.out.println((char) 49);
+
+        String hashString = "edcc70c855d027ed50a40ff092f07b1ae4f372cf";
+        hashString = convertToUtf(hashString);
+        hashString = multiplay(1000, hashString);
+
+        System.out.println("HashString:\n" + hashString);
+        System.out.println("MD5: " + md5Custom(hashString));
+        System.out.println("SHA1: " + sha1(hashString));
+        System.out.println("SHA1: " + sha1("1"));
+        System.out.println("SHA1: " + sha1("ed0caeac3a9656954fa8dcc4e81ba9235a009d72"));
+
+        showShaIter(11);
+        showSha("Привет мир! Данная строка имеет длину в 51 символов");
+
+        System.out.println("***********\n\n");
+        String textData = "Привет мир! Данная строка имеет длину в 51 символов";
+        System.out.println("Исходная строка: " + textData);
+        System.out.println("Начинаем шифрование: " + textData);
+        coding(textData);
+
+    }
+
+
+    //перевести байт к 6-значной строке
+    private static String convertToUtf(String text) {
+        String result = "";
+        char[] chars = text.toCharArray();
+        for (char aChar : chars) {
+            int number = aChar;
+            String converted = Integer.toString(number);
+            while (converted.length() < 6) {
+                converted = "0" + converted;
+            }
+            result += converted;
+        }
+
+        return result;
+    }
+
+    // перевод строки в md5
+    public static String md5Custom(String st) {
+
+        MessageDigest messageDigest = null;
+        byte[] digest = new byte[0];
+
+        try {
+            messageDigest = MessageDigest.getInstance("MD5");
+            messageDigest.reset();
+            messageDigest.update(st.getBytes());
+            digest = messageDigest.digest();
+        } catch (NoSuchAlgorithmException e) {
+            // тут можно обработать ошибку
+            // возникает она если в передаваемый алгоритм в getInstance(,,,) не существует
+            e.printStackTrace();
+        }
+
+        BigInteger bigInt = new BigInteger(1, digest);
+        String md5Hex = bigInt.toString(16);
+
+        while (md5Hex.length() < 32) {
+            md5Hex = "0" + md5Hex;
+        }
+
+        return md5Hex;
+    }
+
+    // перевод строки в SHA1
+    public static String sha1(String Param) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+        MessageDigest SHA = MessageDigest.getInstance("SHA-1");
+        SHA.reset();
+        SHA.update(Param.getBytes("UTF-8"), 0, Param.length());
+        byte[] sha1hash = SHA.digest();
+        return bytesToHexStr(sha1hash);
+    }
+
+    // вспомогательный метод для SHA1
+    public static String bytesToHexStr(byte[] raw) {
+        char[] kDigits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+        int length = raw.length;
+        char[] hex = new char[length * 2];
+        for (int i = 0; i < length; i++) {
+            int value = (raw[i] + 256) % 256;
+            int highIndex = value >> 4;
+            int lowIndex = value & 0x0f;
+            hex[i * 2 + 0] = kDigits[highIndex];
+            hex[i * 2 + 1] = kDigits[lowIndex];
+        }
+        return new String(hex);
+    }
+
+    private static String multiplay(int mult, String text) {
+        String result = "";
+        for (int i = 0; i < mult; i++) {
+            result += text;
+        }
+        return result;
+    }
+
+    // позволяет сделать перебор строки
+    public static void showShaIter(int step) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+        for (int i = 0; i < step; i++) {
+            String context = sha1(convertToUtf(Integer.toString(i)));
+            System.out.println("i: " + i + "; SHA1: " + context + " context: " + convertToUtf(Integer.toString(i)));
+        }
+    }
+
+    public static String showSha(String text) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+        String result = "";
+        result = convertToUtf(text);
+        System.out.println(result);
+        result = sha1(result);
+        System.out.println(result);
+        return result;
+    }
+
+    public static String substringSomeStroke(String text, int indexOf) {
+        return text.substring(0, indexOf);
+
+    }
+
+    public static void coding(String text) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+        //1. переводим данные в utf
+        String utfData = convertToUtf(text);
+        //2. Показываем количество символов для кодировки
+        System.out.println("Символов для кодировки: " + utfData.length());
+        //2. Запускаем цикл, что пока не будет данным меньше, чем 240 символов, продолжать кадировать
+        int cicle = 0;
+        while (utfData.length() > 246) {
+            cicle++;
+            System.out.println("Номер цикла: " + cicle);
+
+            //3. получаем первые 246 символов текста
+            String first246Letters = substringSomeStroke(utfData, 246);
+            System.out.println("Длина первых 246 символов: " + first246Letters.length() + " Символы: " + first246Letters);
+
+            //4. хешируем полученный участок
+            String sha1Hash246FirstLetters = sha1(first246Letters);
+            System.out.println("Длина хэша: " + sha1Hash246FirstLetters.length() + " hash: " + sha1Hash246FirstLetters);
+
+            //5. переводим полученный хэш в utf 240 символов
+            String utfFromSha240letters = convertToUtf(sha1Hash246FirstLetters);
+            System.out.println("Длина значение utf из хэша: " + utfFromSha240letters.length() + " значение: " + utfFromSha240letters);
+
+            //6. заменяем первые 246 символов строки его хэшэм 240 символов
+            utfData = utfData.replaceFirst(first246Letters, utfFromSha240letters);
+            System.out.println("Длмна получившийся utf текста: " + utfData.length() + " значение: " + utfData);
+            System.out.println("\n\n***Повторяем заного цикл***\n\n");
+        }
+
+        System.out.println("Конец программы.");
+
+    }
+}
